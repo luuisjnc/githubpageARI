@@ -20,6 +20,79 @@
       align-items: center;
     }
 
+    /* Nuevos estilos para controles de audio */
+    .audio-controls {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 10px 15px;
+      border-radius: 50px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(5px);
+    }
+
+    .audio-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      color: #ff1493;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .audio-btn:hover {
+      background: rgba(255, 20, 147, 0.1);
+      transform: scale(1.1);
+    }
+
+    .volume-slider {
+      width: 100px;
+      height: 5px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #ddd;
+      outline: none;
+      border-radius: 5px;
+      transition: opacity 0.2s;
+    }
+
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #ff1493;
+      cursor: pointer;
+    }
+
+    .volume-slider:hover {
+      opacity: 1;
+    }
+
+    @media (max-width: 768px) {
+      .audio-controls {
+        bottom: 10px;
+        right: 10px;
+        padding: 8px 12px;
+      }
+      
+      .volume-slider {
+        width: 80px;
+      }
+    }
+
     /* Animación del sobre */
     .envelope-screen {
       position: fixed;
@@ -495,11 +568,63 @@
     photoCards.forEach(card => {
       card.setAttribute('tabindex', '0');
     });
-
-    // Forzar reproducción después de interacción
-    document.body.addEventListener('click', function() {
-    document.getElementById('bgMusic').play();
-    }, { once: true });
   </script>
+
+  
+  <!-- Controles de audio -->
+  <div class="audio-controls">
+    <button id="muteBtn" class="audio-btn" aria-label="Silenciar">🔊</button>
+    <input type="range" id="volumeSlider" class="volume-slider" min="0" max="1" step="0.01" value="0.5">
+  </div>
+
+  <!-- Audio -->
+  <audio id="bgMusic" loop>
+    <source src="tu-audio.mp3" type="audio/mpeg">
+    Tu navegador no soporta audio HTML5.
+  </audio>
+
+  <script>
+    // Controles de audio
+    const bgMusic = document.getElementById('bgMusic');
+    const muteBtn = document.getElementById('muteBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
+
+    // Configurar volumen inicial
+    bgMusic.volume = 0.5;
+
+    // Control deslizante de volumen
+    volumeSlider.addEventListener('input', function() {
+      bgMusic.volume = this.value;
+      
+      // Actualizar icono si se silencia
+      if (this.value == 0) {
+        muteBtn.textContent = '🔇';
+      } else {
+        muteBtn.textContent = '🔊';
+      }
+    });
+
+    // Botón de silencio
+    muteBtn.addEventListener('click', function() {
+      bgMusic.muted = !bgMusic.muted;
+      
+      if (bgMusic.muted) {
+        this.textContent = '🔇';
+        volumeSlider.value = 0;
+      } else {
+        this.textContent = '🔊';
+        volumeSlider.value = bgMusic.volume || 0.5;
+      }
+    });
+
+    // Reproducir audio después de interacción del usuario
+    document.body.addEventListener('click', function() {
+      bgMusic.play().catch(e => console.log("Reproducción automática bloqueada"));
+    }, { once: true });
+
+    // Resto de tu código JavaScript existente...
+  </script>
+
+  
 </body>
 </html>
